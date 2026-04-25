@@ -9,6 +9,7 @@ interface AppState {
   city: string | null;
   isAuthenticated: boolean;
   phone: string | null;
+  token: string | null;
   user: typeof dummyUser | null;
   children: typeof dummyChildren;
   
@@ -16,7 +17,7 @@ interface AppState {
   setHasSeenOnboarding: (val: boolean) => void;
   setNotificationPermission: (val: boolean) => void;
   setCity: (city: string) => void;
-  login: (phone: string) => void;
+  login: (phone: string, token?: string) => void;
   logout: () => void;
   addChild: (child: any) => void;
   topUpBalance: (amount: number) => void;
@@ -32,6 +33,7 @@ export const useStore = create<AppState>()(
       city: null,
       isAuthenticated: false,
       phone: null,
+      token: null,
       user: null,
       children: dummyChildren,
       
@@ -39,10 +41,11 @@ export const useStore = create<AppState>()(
       setHasSeenOnboarding: (val) => set({ hasSeenOnboarding: val }),
       setNotificationPermission: (val) => set({ hasNotificationPermission: val }),
       setCity: (city) => set({ city }),
-      login: (phone) => set({ isAuthenticated: true, phone, user: { ...dummyUser, phone } }),
+      login: (phone, token) => set({ isAuthenticated: true, phone, token: token || null, user: { ...dummyUser, phone } }),
       logout: () => set({ 
         isAuthenticated: false, 
         phone: null, 
+        token: null,
         user: null,
         language: null,
         hasSeenOnboarding: false,

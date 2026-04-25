@@ -14,7 +14,6 @@ import {
   Share2, 
   Plus, 
   Settings,
-  Hexagon,
   Star
 } from 'lucide-react';
 import { useStore } from '@/store/useStore';

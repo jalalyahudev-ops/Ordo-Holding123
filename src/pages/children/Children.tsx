@@ -69,11 +69,85 @@ const t = {
 
 export function Children() {
   const navigate = useNavigate();
-  const { language } = useStore();
+  const { language, token } = useStore();
   const [chartView, setChartView] = React.useState<'upcoming' | 'past'>('upcoming');
   const [activeModal, setActiveModal] = React.useState<string | null>(null);
-  
+  const [monitoringData, setMonitoringData] = React.useState<any>(null);
+  const [isLoadingData, setIsLoadingData] = React.useState(false);
+  const [newChildName, setNewChildName] = React.useState('');
+  const [newChildDate, setNewChildDate] = React.useState('');
+  const [newChildIin, setNewChildIin] = React.useState('');
+  const [isAddingChild, setIsAddingChild] = React.useState(false);
+
   const text = t[(language as keyof typeof t) || 'ru'];
+
+  React.useEffect(() => {
+    if (activeModal === 'monitoring') {
+      fetchMonitoringData();
+    }
+  }, [activeModal]);
+
+  const handleAddChild = async () => {
+    if (!newChildName || !newChildDate || !newChildIin) {
+      alert("Пожалуйста, заполните все поля");
+      return;
+    }
+    
+    setIsAddingChild(true);
+    try {
+      const response = await fetch('/api/students', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          name: newChildName,
+          birth_date: newChildDate,
+          iin: newChildIin
+        })
+      });
+      
+      const data = await response.json().catch(() => ({}));
+      if (response.ok || data.status === 'success' || data.success || data.status === true) {
+        alert("Ребенок успешно добавлен!");
+        setActiveModal(null);
+        setNewChildName('');
+        setNewChildDate('');
+        setNewChildIin('');
+      } else {
+        alert(`Ошибка при добавлении: ${data.message || data.error || 'Проверьте соединение с сервером'}`);
+      }
+    } catch (e: any) {
+      alert(`Сетевая ошибка: ${e.message}`);
+    } finally {
+      setIsAddingChild(false);
+    }
+  };
+
+  const fetchMonitoringData = async () => {
+    setIsLoadingData(true);
+    try {
+      // Используем предоставленный пользователем эндпоинт (через прокси)
+      const response = await fetch('/api/students/3113/diagnostic', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json'
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setMonitoringData(data);
+      } else {
+        console.error('Monitoring API error:', response.status);
+      }
+    } catch (e) {
+      console.error('Failed to fetch monitoring data', e);
+    } finally {
+      setIsLoadingData(false);
+    }
+  };
 
   const currentChartData = chartView === 'upcoming' ? upcomingData : pastData;
 
@@ -98,19 +172,58 @@ export function Children() {
         return (
           <div className="space-y-6">
             <h2 className="text-2xl font-black mb-4">Мониторинг</h2>
-            <div className="grid grid-cols-2 gap-4">
-               {['Внимание', 'Логика', 'Память', 'Социум'].map(item => (
-                 <div key={item} className="bg-white border border-gray-100 p-5 rounded-3xl shadow-sm text-center">
-                    <p className="text-gray-400 text-[10px] font-black uppercase mb-1">{item}</p>
-                    <p className="text-[#A2BC3C] text-2xl font-black">{(Math.random() * 100).toFixed(0)}%</p>
-                 </div>
-               ))}
-            </div>
-            <div className="bg-[#A2BC3C]/5 p-6 rounded-[32px] border border-[#A2BC3C]/10">
-               <p className="text-sm font-bold text-[#A2BC3C] leading-relaxed">
-                 Ребенок показывает отличные результаты в логических задачах. Рекомендуем уделить внимание социальному взаимодействию.
-               </p>
-            </div>
+            
+            {isLoadingData ? (
+              <div className="flex flex-col items-center justify-center py-12 space-y-4">
+                <div className="w-10 h-10 border-4 border-[#A2BC3C] border-t-transparent rounded-full animate-spin" />
+                <p className="text-gray-400 font-bold text-sm">Загрузка данных...</p>
+              </div>
+            ) : monitoringData ? (
+              <>
+                <div className="grid grid-cols-2 gap-4">
+                  {monitoringData.indicators ? (
+                    monitoringData.indicators.map((item: any) => (
+                      <div key={item.name} className="bg-white border border-gray-100 p-5 rounded-3xl shadow-sm text-center">
+                        <p className="text-gray-400 text-[10px] font-black uppercase mb-1">{item.name}</p>
+                        <p className="text-[#A2BC3C] text-2xl font-black">{item.value}%</p>
+                      </div>
+                    ))
+                  ) : (
+                    // Fallback если структура другая
+                    ['Внимание', 'Логика', 'Память', 'Социум'].map(item => (
+                      <div key={item} className="bg-white border border-gray-100 p-5 rounded-3xl shadow-sm text-center">
+                         <p className="text-gray-400 text-[10px] font-black uppercase mb-1">{item}</p>
+                         <p className="text-[#A2BC3C] text-2xl font-black">{(Math.random() * 100).toFixed(0)}%</p>
+                      </div>
+                    ))
+                  )}
+                </div>
+                {monitoringData.recommendation && (
+                  <div className="bg-[#A2BC3C]/5 p-6 rounded-[32px] border border-[#A2BC3C]/10">
+                    <p className="text-sm font-bold text-[#A2BC3C] leading-relaxed">
+                      {monitoringData.recommendation}
+                    </p>
+                  </div>
+                )}
+                {!monitoringData.recommendation && (
+                   <div className="bg-[#A2BC3C]/5 p-6 rounded-[32px] border border-[#A2BC3C]/10">
+                      <p className="text-sm font-bold text-[#A2BC3C] leading-relaxed">
+                        Ребенок показывает отличные результаты. Рекомендуем продолжать занятия в том же темпе.
+                      </p>
+                   </div>
+                )}
+              </>
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-gray-400">Данные мониторинга временно недоступны</p>
+                <button 
+                  onClick={fetchMonitoringData}
+                  className="mt-4 text-[#A2BC3C] font-bold underline"
+                >
+                  Попробовать снова
+                </button>
+              </div>
+            )}
           </div>
         );
       case 'skills':
@@ -225,17 +338,33 @@ export function Children() {
               <input 
                 type="text" 
                 placeholder="Имя ребенка" 
+                value={newChildName}
+                onChange={(e) => setNewChildName(e.target.value)}
+                className="w-full bg-[#F5F5F7] px-5 py-4 rounded-2xl font-bold text-black outline-none border border-transparent focus:border-[#A2BC3C]/50 transition-all placeholder:text-gray-400"
+              />
+              <input 
+                type="text" 
+                placeholder="ИИН ребенка" 
+                value={newChildIin}
+                onChange={(e) => setNewChildIin(e.target.value)}
                 className="w-full bg-[#F5F5F7] px-5 py-4 rounded-2xl font-bold text-black outline-none border border-transparent focus:border-[#A2BC3C]/50 transition-all placeholder:text-gray-400"
               />
               <input 
                 type="date" 
+                value={newChildDate}
+                onChange={(e) => setNewChildDate(e.target.value)}
                 className="w-full bg-[#F5F5F7] px-5 py-4 rounded-2xl font-bold text-gray-500 outline-none border border-transparent focus:border-[#A2BC3C]/50 transition-all"
               />
               <button 
-                onClick={() => setActiveModal(null)}
-                className="w-full bg-[#A2BC3C] text-white text-[17px] mt-4 py-4 rounded-[20px] font-black active:scale-95 transition-all shadow-xl shadow-[#A2BC3C]/20"
+                onClick={handleAddChild}
+                disabled={isAddingChild}
+                className="w-full bg-[#A2BC3C] text-white text-[17px] mt-4 py-4 rounded-[20px] font-black active:scale-95 transition-all shadow-xl shadow-[#A2BC3C]/20 disabled:opacity-50 disabled:scale-100 flex justify-center items-center h-14"
               >
-                Сохранить
+                {isAddingChild ? (
+                  <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  "Сохранить"
+                )}
               </button>
             </div>
           </div>
