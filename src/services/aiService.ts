@@ -1,12 +1,19 @@
 import { GoogleGenAI } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+// Ключ берется из переменных окружения. В Vercel его нужно добавить как VITE_GEMINI_API_KEY
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY || process.env.GEMINI_API_KEY;
+
+const ai = new GoogleGenAI({ apiKey: apiKey || "" });
 
 export async function getAiInsights(childData: {
   name: string;
   indicators: Array<{ name: string; value: number }>;
   language: string;
 }) {
+  if (!apiKey) {
+    console.error("Gemini API Key is missing! Set VITE_GEMINI_API_KEY in environment.");
+    return null;
+  }
   const prompt = `
     You are an expert child development psychologist and educational consultant for the "Orda" educational platform.
     
