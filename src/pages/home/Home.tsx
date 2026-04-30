@@ -142,25 +142,25 @@ export function Home() {
         </div>
 
         {/* AI Growth Tip Banner */}
-        <div className="px-5">
+        <div className="px-5 max-w-3xl mx-auto w-full">
           <motion.div 
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => navigate('/children')}
-            className="bg-white border-2 border-[#A2BC3C]/20 rounded-[32px] p-6 flex items-center justify-between shadow-sm relative overflow-hidden group transition-all"
+            className="bg-white border-2 border-[#A2BC3C]/20 rounded-[32px] p-6 flex flex-col md:flex-row items-start md:items-center justify-between shadow-sm relative overflow-hidden group transition-all gap-4"
           >
-            <div className="flex items-center gap-5 relative z-10">
-              <div className="w-14 h-14 bg-[#A2BC3C]/10 rounded-2xl flex items-center justify-center text-[#A2BC3C] group-hover:rotate-12 transition-transform">
+            <div className="flex items-center gap-5 relative z-10 w-full">
+              <div className="w-14 h-14 shrink-0 bg-[#A2BC3C]/10 rounded-2xl flex items-center justify-center text-[#A2BC3C] group-hover:rotate-12 transition-transform">
                 <Sparkles className="w-8 h-8" />
               </div>
-              <div className="max-w-[200px]">
+              <div className="flex-1 min-w-0">
                 <h4 className="font-black text-sm text-gray-400 uppercase tracking-widest mb-1">AI Совет дня</h4>
                 <p className="font-bold text-gray-800 leading-tight">
                   {text.aiGrowth}
                 </p>
               </div>
             </div>
-            <button className="bg-[#A2BC3C] text-white px-4 py-2 rounded-xl text-xs font-black active:scale-95 transition-all shadow-lg shadow-[#A2BC3C]/20 z-10">
+            <button className="bg-[#A2BC3C] shrink-0 w-full md:w-auto text-white px-4 py-3 rounded-xl text-xs font-black active:scale-95 transition-all shadow-lg shadow-[#A2BC3C]/20 z-10">
               {text.viewInsights}
             </button>
             <div className="absolute top-0 right-0 w-32 h-full bg-[#A2BC3C]/5 -skew-x-12 translate-x-12" />
@@ -168,7 +168,7 @@ export function Home() {
         </div>
 
         {/* Promo Banner */}
-        <div className="px-5">
+        <div className="px-5 max-w-3xl mx-auto w-full">
           <motion.div 
             whileTap={{ scale: 0.98 }}
             onClick={() => navigate('/subscriptions')}
@@ -196,12 +196,12 @@ export function Home() {
         </div>
 
         {/* Recommended Posts Header */}
-        <div className="px-5">
+        <div className="px-5 max-w-2xl mx-auto w-full">
           <h2 className="text-2xl font-bold tracking-tight text-black">{text.recPosts}</h2>
         </div>
 
         {/* Posts Feed with Modal triggers */}
-        <div className="space-y-8 pb-10">
+        <div className="space-y-8 pb-10 px-5 max-w-2xl mx-auto w-full">
           {dummyPosts.map(post => (
             <PostCard 
               key={post.id} 
@@ -255,7 +255,7 @@ export function Home() {
 
 const PostCard: React.FC<{ post: any, text: any, onEvaluate: () => void }> = ({ post, text, onEvaluate }) => {
   return (
-    <div className="relative mx-5">
+    <div className="relative">
       <div className="bg-white rounded-[32px] overflow-hidden border border-gray-100 shadow-[0_10px_30px_rgba(0,0,0,0.05)]">
         {/* Post Header */}
         <div className="p-5 flex justify-between items-center">

@@ -552,13 +552,13 @@ export function Children() {
         </div>
 
         {/* Action Grid - Style inspired by Home menu */}
-        <section className="grid grid-cols-1 gap-4">
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
            <DashButton icon={<Star className="text-yellow-500" />} label={text.results} onClick={() => setActiveModal('results')} />
            <DashButton icon={<Crosshair className="text-[#A2BC3C]" />} label={text.monitoringLabel} onClick={() => setActiveModal('monitoring')} />
            <DashButton icon={<Sparkles className="text-[#A2BC3C] animate-pulse" />} label={text.aiConsultant} onClick={() => setActiveModal('ai_consultant')} primary />
            <DashButton icon={<BookOpen className="text-indigo-500" />} label={text.skillsDetail} onClick={() => setActiveModal('skills')} />
            
-           <div className="grid grid-cols-2 gap-4">
+           <div className="grid grid-cols-2 gap-4 md:col-span-2">
               <DashButton icon={<Calendar className="text-green-500" />} label={text.dailyRoutine} onClick={() => setActiveModal('routine')} small />
               <DashButton icon={<ClipboardList className="text-orange-500" />} label={text.kinderMenu} onClick={() => setActiveModal('menu')} small />
            </div>
@@ -669,7 +669,7 @@ export function Children() {
                animate={{ y: 0 }}
                exit={{ y: '100%' }}
                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-               className="relative w-full max-w-md bg-white rounded-t-[40px] p-8 pb-12 shadow-2xl overflow-y-auto max-h-[85vh] no-scrollbar"
+               className="relative w-full max-w-md md:max-w-xl bg-white rounded-t-[40px] md:rounded-[40px] p-8 pb-12 shadow-2xl overflow-y-auto max-h-[85vh] no-scrollbar md:my-auto"
              >
                 <div className="w-12 h-1.5 bg-gray-100 rounded-full mx-auto mb-8" />
                 {renderModalContent()}

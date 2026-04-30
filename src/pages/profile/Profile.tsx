@@ -244,7 +244,7 @@ export function Profile() {
 
   return (
     <div className="flex flex-col h-full bg-[#F5F5F7] text-black no-scrollbar overflow-y-auto pb-24">
-      <div className="px-5 pt-8 pb-4 flex justify-between items-center bg-white sticky top-0 z-30 shadow-sm transition-all">
+      <div className="px-5 pt-8 pb-4 flex justify-between items-center bg-white sticky top-0 z-30 shadow-sm transition-all md:px-8">
         <h1 className="text-3xl font-extrabold tracking-tight text-black">{text.title}</h1>
         <div className="flex items-center gap-5">
           <button onClick={() => setActiveProfileModal('post')} className="text-black hover:opacity-70 active:scale-95 transition-all">
@@ -256,114 +256,116 @@ export function Profile() {
         </div>
       </div>
 
-      <div className="mx-5 mt-6 bg-white rounded-[32px] p-6 shadow-[0_10px_30px_rgba(0,0,0,0.05)] relative flex flex-col items-center">
-        <div className="relative mb-6">
-          <div className="w-32 h-32 rounded-full border-4 border-white overflow-hidden bg-gray-100 shadow-xl">
-            <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
+      <div className="max-w-3xl mx-auto w-full">
+        <div className="mx-5 mt-6 bg-white rounded-[32px] p-6 shadow-[0_10px_30px_rgba(0,0,0,0.05)] relative flex flex-col items-center">
+          <div className="relative mb-6">
+            <div className="w-32 h-32 rounded-full border-4 border-white overflow-hidden bg-gray-100 shadow-xl">
+              <img src={profileImage} alt="Profile" className="w-full h-full object-cover" />
+            </div>
+            <button 
+              onClick={() => fileInputRef.current?.click()}
+              className="absolute bottom-0 right-0 w-8 h-8 bg-[#A2BC3C] rounded-full border-2 border-white flex items-center justify-center shadow-lg active:scale-95 transition-transform"
+            >
+              <Plus className="w-5 h-5 text-white" />
+            </button>
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              onChange={handleImageUpload} 
+              accept="image/*" 
+              className="hidden" 
+            />
           </div>
-          <button 
-            onClick={() => fileInputRef.current?.click()}
-            className="absolute bottom-0 right-0 w-8 h-8 bg-[#A2BC3C] rounded-full border-2 border-white flex items-center justify-center shadow-lg active:scale-95 transition-transform"
-          >
-            <Plus className="w-5 h-5 text-white" />
+
+          <div className="text-center space-y-1 mb-6">
+            <h2 className="text-[28px] font-bold tracking-tight text-black">Аида Азаматкизы</h2>
+            <div className="flex items-center justify-center gap-2 text-gray-400">
+              <Hexagon className="w-5 h-5 fill-gray-200 text-gray-200" />
+              <span className="text-sm font-bold">{text.beginner}</span>
+            </div>
+          </div>
+
+          <div className="flex justify-around w-full mb-8">
+            <Stat item="1" label={text.subscribers} />
+            <div className="border-x border-gray-100 h-8 mt-2" />
+            <Stat item="0" label={text.following} />
+            <div className="border-x border-gray-100 h-8 mt-2" />
+            <Stat item="1" label={text.views} active />
+          </div>
+
+          <div className="w-full space-y-4">
+            <button 
+              onClick={() => handleOpenModal('bio', user?.bio || '')} 
+              className="w-full bg-[#F5F5F7] text-black hover:bg-gray-100 py-4 rounded-2xl font-bold text-[17px] active:scale-95 transition-all truncate px-4"
+            >
+              {user?.bio || text.addBio}
+            </button>
+            <div className="flex gap-4">
+              <button 
+                onClick={() => handleOpenModal('instagram', user?.instagram || '')}
+                className="flex-1 bg-white border border-gray-100 py-4 rounded-2xl flex items-center justify-center gap-2 text-[#A2BC3C] font-bold active:scale-95 transition-all shadow-sm truncate px-2"
+              >
+                {user?.instagram ? `@${user.instagram}` : 'Instagram'}
+              </button>
+              <button 
+                onClick={() => handleOpenModal('tiktok', user?.tiktok || '')}
+                className="flex-1 bg-white border border-gray-100 py-4 rounded-2xl flex items-center justify-center gap-2 text-[#A2BC3C] font-bold active:scale-95 transition-all shadow-sm truncate px-2"
+              >
+                {user?.tiktok ? `@${user.tiktok}` : 'TikTok'}
+              </button>
+            </div>
+            <div className="flex items-center gap-4">
+              <button 
+                onClick={() => setActiveProfileModal('friends')}
+                className="flex-1 bg-[#A2BC3C] hover:opacity-90 py-5 rounded-3xl text-white font-bold text-[18px] active:scale-95 transition-all shadow-xl shadow-[#A2BC3C]/20"
+              >
+                {text.addFriends}
+              </button>
+              <button 
+                onClick={handleShare}
+                className="w-16 h-16 bg-white border border-gray-100 rounded-3xl flex items-center justify-center active:scale-95 transition-all shadow-sm"
+              >
+                <Share2 className="w-7 h-7 text-black" />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="px-5 mt-8 space-y-6">
+          <div className="bg-white rounded-[32px] overflow-hidden border border-gray-100 shadow-[0_10px_30px_rgba(0,0,0,0.05)]">
+            <MenuItem icon={<Users className="text-[#A2BC3C]" />} label={text.children} onClick={() => navigate('/children')} />
+            <div className="h-px bg-gray-50 mx-6" />
+            <MenuItem icon={<Ticket className="text-[#A2BC3C]" />} label={text.promo} onClick={() => setActiveProfileModal('promo')} />
+            <div className="h-px bg-gray-50 mx-6" />
+            <MenuItem icon={<Gift className="text-[#A2BC3C]" />} label={text.referral} onClick={() => navigate('/referral')} badge={text.referralBadge} />
+          </div>
+
+          <div className="bg-white rounded-[32px] overflow-hidden border border-gray-100 shadow-[0_10px_30px_rgba(0,0,0,0.05)]">
+            <MenuItem icon={<ShieldCheck className="text-[#A2BC3C]" />} label={text.kyc} onClick={() => navigate('/kyc')} />
+            <div className="h-px bg-gray-50 mx-6" />
+            <MenuItem icon={<Building2 className="text-[#A2BC3C]" />} label={text.suggest} onClick={() => navigate('/suggest')} />
+          </div>
+
+          <div className="bg-white rounded-[32px] overflow-hidden border border-gray-100 shadow-[0_10px_30px_rgba(0,0,0,0.05)]">
+            <MenuItem icon={<MessageCircle className="text-[#A2BC3C]" />} label={text.support} onClick={() => navigate('/support')} />
+            <div className="h-px bg-gray-50 mx-6" />
+            <MenuItem icon={<RefreshCcw className="text-[#A2BC3C]" />} label={text.refund} onClick={() => navigate('/refund')} />
+            <div className="h-px bg-gray-50 mx-6" />
+            <MenuItem icon={<Shield className="text-[#A2BC3C]" />} label={text.privacy} onClick={() => setActiveProfileModal('privacy')} />
+          </div>
+
+          <button onClick={handleLogout} className="w-full bg-white text-red-500 py-6 rounded-[32px] font-bold flex items-center justify-center gap-2 active:scale-95 transition-transform border border-gray-100 shadow-sm">
+            <LogOut className="w-6 h-6" />
+            {text.logout}
           </button>
-          <input 
-            type="file" 
-            ref={fileInputRef} 
-            onChange={handleImageUpload} 
-            accept="image/*" 
-            className="hidden" 
-          />
         </div>
-
-        <div className="text-center space-y-1 mb-6">
-          <h2 className="text-[28px] font-bold tracking-tight text-black">Аида Азаматкизы</h2>
-          <div className="flex items-center justify-center gap-2 text-gray-400">
-            <Hexagon className="w-5 h-5 fill-gray-200 text-gray-200" />
-            <span className="text-sm font-bold">{text.beginner}</span>
-          </div>
-        </div>
-
-        <div className="flex justify-around w-full mb-8">
-          <Stat item="1" label={text.subscribers} />
-          <div className="border-x border-gray-100 h-8 mt-2" />
-          <Stat item="0" label={text.following} />
-          <div className="border-x border-gray-100 h-8 mt-2" />
-          <Stat item="1" label={text.views} active />
-        </div>
-
-        <div className="w-full space-y-4">
-          <button 
-            onClick={() => handleOpenModal('bio', user?.bio || '')} 
-            className="w-full bg-[#F5F5F7] text-black hover:bg-gray-100 py-4 rounded-2xl font-bold text-[17px] active:scale-95 transition-all truncate px-4"
-          >
-            {user?.bio || text.addBio}
-          </button>
-          <div className="flex gap-4">
-            <button 
-              onClick={() => handleOpenModal('instagram', user?.instagram || '')}
-              className="flex-1 bg-white border border-gray-100 py-4 rounded-2xl flex items-center justify-center gap-2 text-[#A2BC3C] font-bold active:scale-95 transition-all shadow-sm truncate px-2"
-            >
-              {user?.instagram ? `@${user.instagram}` : 'Instagram'}
-            </button>
-            <button 
-              onClick={() => handleOpenModal('tiktok', user?.tiktok || '')}
-              className="flex-1 bg-white border border-gray-100 py-4 rounded-2xl flex items-center justify-center gap-2 text-[#A2BC3C] font-bold active:scale-95 transition-all shadow-sm truncate px-2"
-            >
-              {user?.tiktok ? `@${user.tiktok}` : 'TikTok'}
-            </button>
-          </div>
-          <div className="flex items-center gap-4">
-            <button 
-              onClick={() => setActiveProfileModal('friends')}
-              className="flex-1 bg-[#A2BC3C] hover:opacity-90 py-5 rounded-3xl text-white font-bold text-[18px] active:scale-95 transition-all shadow-xl shadow-[#A2BC3C]/20"
-            >
-              {text.addFriends}
-            </button>
-            <button 
-              onClick={handleShare}
-              className="w-16 h-16 bg-white border border-gray-100 rounded-3xl flex items-center justify-center active:scale-95 transition-all shadow-sm"
-            >
-              <Share2 className="w-7 h-7 text-black" />
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div className="px-5 mt-8 space-y-6">
-        <div className="bg-white rounded-[32px] overflow-hidden border border-gray-100 shadow-[0_10px_30px_rgba(0,0,0,0.05)]">
-          <MenuItem icon={<Users className="text-[#A2BC3C]" />} label={text.children} onClick={() => navigate('/children')} />
-          <div className="h-px bg-gray-50 mx-6" />
-          <MenuItem icon={<Ticket className="text-[#A2BC3C]" />} label={text.promo} onClick={() => setActiveProfileModal('promo')} />
-          <div className="h-px bg-gray-50 mx-6" />
-          <MenuItem icon={<Gift className="text-[#A2BC3C]" />} label={text.referral} onClick={() => navigate('/referral')} badge={text.referralBadge} />
-        </div>
-
-        <div className="bg-white rounded-[32px] overflow-hidden border border-gray-100 shadow-[0_10px_30px_rgba(0,0,0,0.05)]">
-          <MenuItem icon={<ShieldCheck className="text-[#A2BC3C]" />} label={text.kyc} onClick={() => navigate('/kyc')} />
-          <div className="h-px bg-gray-50 mx-6" />
-          <MenuItem icon={<Building2 className="text-[#A2BC3C]" />} label={text.suggest} onClick={() => navigate('/suggest')} />
-        </div>
-
-        <div className="bg-white rounded-[32px] overflow-hidden border border-gray-100 shadow-[0_10px_30px_rgba(0,0,0,0.05)]">
-          <MenuItem icon={<MessageCircle className="text-[#A2BC3C]" />} label={text.support} onClick={() => navigate('/support')} />
-          <div className="h-px bg-gray-50 mx-6" />
-          <MenuItem icon={<RefreshCcw className="text-[#A2BC3C]" />} label={text.refund} onClick={() => navigate('/refund')} />
-          <div className="h-px bg-gray-50 mx-6" />
-          <MenuItem icon={<Shield className="text-[#A2BC3C]" />} label={text.privacy} onClick={() => setActiveProfileModal('privacy')} />
-        </div>
-
-        <button onClick={handleLogout} className="w-full bg-white text-red-500 py-6 rounded-[32px] font-bold flex items-center justify-center gap-2 active:scale-95 transition-transform border border-gray-100 shadow-sm">
-          <LogOut className="w-6 h-6" />
-          {text.logout}
-        </button>
       </div>
 
       <AnimatePresence>
         {activeProfileModal && (
           <div className="fixed inset-0 z-50 flex items-end justify-center p-0">
              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setActiveProfileModal(null)} className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
-             <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ type: 'spring', damping: 25, stiffness: 200 }} className="relative w-full max-w-md bg-white rounded-t-[40px] p-8 pb-12 shadow-2xl overflow-y-auto max-h-[85vh] no-scrollbar">
+             <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }} transition={{ type: 'spring', damping: 25, stiffness: 200 }} className="relative w-full max-w-md md:max-w-xl bg-white rounded-t-[40px] md:rounded-[40px] p-8 pb-12 shadow-2xl overflow-y-auto max-h-[85vh] no-scrollbar md:my-auto">
                 <div className="w-12 h-1.5 bg-gray-100 rounded-full mx-auto mb-8" />
                 {renderModalContent()}
                 <button onClick={() => setActiveProfileModal(null)} className="mt-10 w-full py-4 text-gray-400 font-bold uppercase tracking-widest text-xs hover:text-black transition-colors">Закрыть</button>

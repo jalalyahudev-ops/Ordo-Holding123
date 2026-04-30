@@ -252,7 +252,7 @@ export function Search() {
             </MapContainer>
           </div>
         ) : filtered.length > 0 ? (
-          <div className="space-y-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {filtered.map(activity => (
               <div 
                 key={activity.id} 
@@ -309,7 +309,7 @@ export function Search() {
                animate={{ y: 0 }}
                exit={{ y: '100%' }}
                transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-               className="relative w-full max-w-md bg-white rounded-t-[40px] shadow-2xl overflow-hidden"
+               className="relative w-full max-w-md md:max-w-2xl bg-white rounded-t-[40px] md:rounded-[40px] shadow-2xl overflow-hidden md:my-auto"
             >
                <div className="h-64 relative">
                   <img src={selectedActivity.image} alt="" className="w-full h-full object-cover" />
@@ -367,7 +367,7 @@ export function Search() {
               animate={{ y: 0 }}
               exit={{ y: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="relative w-full max-w-md bg-[#F5F5F7] rounded-t-[40px] shadow-2xl overflow-hidden flex flex-col max-h-[85vh]"
+              className="relative w-full max-w-md md:max-w-2xl bg-[#F5F5F7] rounded-t-[40px] md:rounded-[40px] shadow-2xl overflow-hidden flex flex-col max-h-[85vh] md:my-auto"
             >
               {/* Swipe Indicator & Header */}
               <div className="bg-white rounded-t-[40px] pt-4 pb-4 px-6 border-b border-gray-100 flex-shrink-0 z-10 sticky top-0">
