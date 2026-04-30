@@ -131,59 +131,32 @@ export function Children() {
     }
     
     setIsAddingChild(true);
-    try {
-      const response = await fetch('/api/students', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-          name: newChildName,
-          birth_date: newChildDate,
-          iin: newChildIin
-        })
-      });
-      
-      const data = await response.json().catch(() => ({}));
-      if (response.ok || data.status === 'success' || data.success || data.status === true) {
-        alert("Ребенок успешно добавлен!");
-        setActiveModal(null);
-        setNewChildName('');
-        setNewChildDate('');
-        setNewChildIin('');
-      } else {
-        alert(`Ошибка при добавлении: ${data.message || data.error || 'Проверьте соединение с сервером'}`);
-      }
-    } catch (e: any) {
-      alert(`Сетевая ошибка: ${e.message}`);
-    } finally {
+    // Simulate local saving without server integration
+    setTimeout(() => {
       setIsAddingChild(false);
-    }
+      alert("Ребенок успешно добавлен (локально)!");
+      setActiveModal(null);
+      setNewChildName('');
+      setNewChildDate('');
+      setNewChildIin('');
+    }, 1000);
   };
 
   const fetchMonitoringData = async () => {
     setIsLoadingData(true);
-    try {
-      // Используем предоставленный пользователем эндпоинт (через прокси)
-      const response = await fetch('/api/students/3113/diagnostic', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Accept': 'application/json'
-        }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setMonitoringData(data);
-      } else {
-        console.error('Monitoring API error:', response.status);
-      }
-    } catch (e) {
-      console.error('Failed to fetch monitoring data', e);
-    } finally {
+    // Provide simulated data directly instead of calling external API
+    setTimeout(() => {
       setIsLoadingData(false);
-    }
+      setMonitoringData({
+        indicators: [
+          { name: 'Внимание', value: 82 },
+          { name: 'Логика', value: 91 },
+          { name: 'Память', value: 74 },
+          { name: 'Социум', value: 65 },
+        ],
+        recommendation: "Ребенок проявляет выдающиеся способности в логическом мышлении. Рекомендуем обратить внимание на шахматы или программирование."
+      });
+    }, 800);
   };
 
   const currentChartData = chartView === 'upcoming' ? upcomingData : pastData;

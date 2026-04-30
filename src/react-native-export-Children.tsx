@@ -41,36 +41,15 @@ export function ChildrenScreen({ navigation }) {
     }
     
     setIsAddingChild(true);
-    try {
-      const response = await fetch('https://ordo.education/api/students', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-          name: newChildName,
-          birth_date: newChildDate,
-          iin: newChildIin
-        })
-      });
-      
-      const data = await response.json().catch(() => ({}));
-      if (response.ok || data.status === 'success' || data.success || data.status === true) {
-        alert("Ребенок успешно добавлен!");
-        setActiveModal(null);
-        setNewChildName('');
-        setNewChildDate('');
-        setNewChildIin('');
-      } else {
-        alert(`Ошибка при добавлении: ${data.message || data.error || 'Проверьте соединение с сервером'}`);
-      }
-    } catch (e) {
-      alert(`Сетевая ошибка: ${e.message}`);
-    } finally {
+    // Simulate local success for mobile export
+    setTimeout(() => {
       setIsAddingChild(false);
-    }
+      alert("Ребенок успешно добавлен (локально)!");
+      setActiveModal(null);
+      setNewChildName('');
+      setNewChildDate('');
+      setNewChildIin('');
+    }, 1000);
   };
 
   const text = {

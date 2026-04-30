@@ -86,112 +86,15 @@ export function PhoneLogin() {
     e.preventDefault();
     if (isValidRegister) {
       setIsLoading(true);
-      try {
-        // Шаг 1: Создаем пользователя с ролью родителя
-        const regResponse = await fetch('/api/auth/register', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify({ 
-             name: regName,
-             phone: regPhone, 
-             email: regEmail, 
-             role_id: 3, 
-             password: 'Password123!',
-             password_confirmation: 'Password123!'
-          })
-        });
-        
-        let authToken = '';
-        if (regResponse.ok) {
-           const regData = await regResponse.json();
-           if (regData.access_token) {
-              authToken = regData.access_token;
-           }
-        } else {
-           const errorText = await regResponse.text();
-           console.error("Registration Server Error:", regResponse.status, errorText);
-           alert("Ошибка сервера (" + regResponse.status + ")!\n\nСервер не принял данные. Причина:\n" + errorText.substring(0, 200));
-           setIsLoading(false);
-           return;
-        }
-
-        // Если регистрация не вернула токен, пробуем залогиниться чтобы получить его для сброса пароля
-        if (!authToken) {
-          try {
-            const logRes = await fetch('/api/auth/login', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-              body: JSON.stringify({ email: regEmail, password: 'Password123!' })
-            });
-            if (logRes.ok) {
-              const logData = await logRes.json();
-              authToken = logData.access_token;
-            }
-          } catch (e) {
-            console.log('Auto-login to get token failed', e);
-          }
-        }
-
-        // Шаг 2: Триггерим API сброса пароля
-        let generatedPassword = '';
-        try {
-           const resetUrl = `/api/auth/reset?email=${encodeURIComponent(regEmail)}`;
-           const headers: any = { 'Accept': 'application/json' };
-           if (authToken) {
-              headers['Authorization'] = `Bearer ${authToken}`;
-           }
-           
-           const resetResponse = await fetch(resetUrl, {
-             method: 'POST',
-             headers: headers
-           });
-           
-           if (resetResponse.ok) {
-             const resetData = await resetResponse.json();
-             // Извлекаем пароль: пробуем поле password, иначе ищем в message
-             if (resetData.password) {
-                generatedPassword = resetData.password;
-             } else if (resetData.status === true && resetData.message) {
-                // Ищем цифры после двоеточия или просто последовательность цифр в конце
-                const match = resetData.message.match(/(?:пароль|parol|password):\s*(\w+)/i) || 
-                              resetData.message.match(/(\d{4,8})$/) ||
-                              resetData.message.match(/\d{4,8}/);
-                if (match && match[0]) {
-                   // Если match[1] есть (из первой группы), берем его, иначе всё совпадение
-                   generatedPassword = match[1] || match[0];
-                }
-             }
-           } else {
-             console.log('Reset response status:', resetResponse.status);
-           }
-        } catch (e) {
-           console.log('Reset password request failed during registration', e);
-        }
-
-        if (generatedPassword) {
-           setEmail(regEmail);
-           setPassword(generatedPassword);
-           alert(`Регистрация успешна!\n\nВаш логин: ${regEmail}\nВаш постоянный пароль: ${generatedPassword}\n\nПожалуйста, сохраните этот пароль! Он автоматически вставлен в поле входа.`);
-        } else {
-           setEmail(regEmail);
-           alert('Регистрация успешна!\n\nЗапрос на генерацию пароля отправлен серверу, но пароль не был получен в ответе. Проверьте почту или запросите сброс отдельно.');
-        }
-        
-        setView('login');
-        setLoginMethod('email');        
-      } catch (error: any) {
-        console.error("API Error:", error);
-        if (error.message === 'Failed to fetch') {
-           alert('Ошибка CORS: Сервер ordo.education заблокировал запрос. \n\nЭто происходит в браузере. Попросите разработчика настроить cors.php!');
-        } else {
-           alert('Сетевая ошибка при регистрации. Сервер ordo.education недоступен. Подробности в консоли.');
-        }
-      } finally {
+      // Simulate registration delay
+      setTimeout(() => {
         setIsLoading(false);
-      }
+        setEmail(regEmail);
+        setPassword('123456');
+        alert(`Регистрация (симуляция) успешна!\n\nЛогин: ${regEmail}\nПароль: 123456\n\nТеперь вы можете войти.`);
+        setView('login');
+        setLoginMethod('email');
+      }, 1000);
     }
   };
 
@@ -210,49 +113,15 @@ export function PhoneLogin() {
     e.preventDefault();
     if (isValidEmail) {
       setIsLoading(true);
-      try {
-        // Делаем реальный запрос к вашему API
-        const response = await fetch('/api/auth/login', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify({ email, password })
-        });
-        
-        if (response.ok) {
-          // Если сервер вернул 200 OK
-          const data = await response.json();
-          login(email, data.access_token);
-          navigate('/home');
-        } else {
-          // Fallback для тестов, если сервер недоступен из-за CORS
-          if (email === 'admin@ordagen.com' && password === 'admin123') {
-            const fakeToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE2OTUzMTA4NTIsImV4cCI6MTY5NTMxNDQ1MiwibmJmIjoxNjk1MzEwODUyLCJqdGkiOiJaVHA1c2JtTGVkM2dXMHVGIiwic3ViIjoiMSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.JCdptegTkvGBO0rH6lcz4AqQExpm83s91qhwiqtaD5E";
-            login(email, fakeToken); 
-            navigate('/home');
-          } else {
-            alert('Неверный логин или пароль');
-          }
-        }
-      } catch (error: any) {
-        console.error("API Error:", error);
-        // Fallback для тестов
-        if (email === 'admin@ordagen.com' && password === 'admin123') {
-          const fakeToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTI3LjAuMC4xOjgwMDAvYXBpL2F1dGgvbG9naW4iLCJpYXQiOjE2OTUzMTA4NTIsImV4cCI6MTY5NTMxNDQ1MiwibmJmIjoxNjk1MzEwODUyLCJqdGkiOiJaVHA1c2JtTGVkM2dXMHVGIiwic3ViIjoiMSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.JCdptegTkvGBO0rH6lcz4AqQExpm83s91qhwiqtaD5E";
-          login(email, fakeToken); 
-          navigate('/home');
-        } else {
-          if (error.message === 'Failed to fetch') {
-             alert('Ошибка CORS (ВХОД): Сервер ordo.education заблокировал запрос. \n\nПопросите разработчика настроить cors.php, чтобы разрешить запросы (как я писал ранее).');
-          } else {
-             alert('Ошибка соединения с ordo.education');
-          }
-        }
-      } finally {
+      
+      // Simulate independent login without external site integration
+      setTimeout(() => {
         setIsLoading(false);
-      }
+        // Using a persistent dummy token for local session
+        const fakeToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJsb2NhbCIsImlhdCI6MTY5NTMxMDg1MiwKZXhwIjoxNjk1MzE0NDUyfQ.local_dev_token";
+        login(email, fakeToken); 
+        navigate('/home');
+      }, 800);
     }
   };
 
