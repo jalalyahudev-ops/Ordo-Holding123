@@ -39,16 +39,15 @@ export async function getAiInsights(childData: {
   `;
 
   try {
-    const model = ai.getGenerativeModel({ 
-      model: "gemini-1.5-flash",
-      generationConfig: {
+    const response = await ai.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
+      config: {
         responseMimeType: "application/json"
       }
     });
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+    const text = response.text;
     
     if (!text) return null;
     return JSON.parse(text.trim());
