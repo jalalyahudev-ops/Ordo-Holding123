@@ -1,6 +1,21 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, Bookmark, Plus, Heart, MessageCircle, Share, Eye, MoreHorizontal, SquarePlus, Percent, ChevronRight, SquarePen, Star } from 'lucide-react';
+import { 
+  Bell, 
+  Bookmark, 
+  Plus, 
+  Heart, 
+  MessageCircle, 
+  Share, 
+  Eye, 
+  MoreHorizontal, 
+  SquarePlus, 
+  Percent, 
+  ChevronRight, 
+  SquarePen, 
+  Star,
+  Sparkles
+} from 'lucide-react';
 import { useStore } from '@/store/useStore';
 import { dummyPosts } from '@/data/dummy';
 import { motion, AnimatePresence } from 'motion/react';
@@ -17,6 +32,8 @@ const t = {
     evaluateManager: 'Оцените менеджера',
     writePost: 'Написать пост',
     addStory: 'Добавить историю',
+    aiGrowth: 'AI Анализ роста: Ваш ребенок проявляет талант в логике!',
+    viewInsights: 'Узнать больше',
   },
 };
 
@@ -122,6 +139,32 @@ export function Home() {
               <span className="text-sm font-medium text-gray-700 truncate w-20 text-center">User_{i}</span>
             </div>
           ))}
+        </div>
+
+        {/* AI Growth Tip Banner */}
+        <div className="px-5">
+          <motion.div 
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={() => navigate('/children')}
+            className="bg-white border-2 border-[#A2BC3C]/20 rounded-[32px] p-6 flex items-center justify-between shadow-sm relative overflow-hidden group transition-all"
+          >
+            <div className="flex items-center gap-5 relative z-10">
+              <div className="w-14 h-14 bg-[#A2BC3C]/10 rounded-2xl flex items-center justify-center text-[#A2BC3C] group-hover:rotate-12 transition-transform">
+                <Sparkles className="w-8 h-8" />
+              </div>
+              <div className="max-w-[200px]">
+                <h4 className="font-black text-sm text-gray-400 uppercase tracking-widest mb-1">AI Совет дня</h4>
+                <p className="font-bold text-gray-800 leading-tight">
+                  {text.aiGrowth}
+                </p>
+              </div>
+            </div>
+            <button className="bg-[#A2BC3C] text-white px-4 py-2 rounded-xl text-xs font-black active:scale-95 transition-all shadow-lg shadow-[#A2BC3C]/20 z-10">
+              {text.viewInsights}
+            </button>
+            <div className="absolute top-0 right-0 w-32 h-full bg-[#A2BC3C]/5 -skew-x-12 translate-x-12" />
+          </motion.div>
         </div>
 
         {/* Promo Banner */}

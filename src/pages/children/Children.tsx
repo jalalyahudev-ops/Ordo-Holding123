@@ -14,7 +14,11 @@ import {
   BookOpen,
   Calendar,
   ClipboardList,
-  Wallet
+  Wallet,
+  Sparkles,
+  Zap,
+  Target,
+  Trophy
 } from 'lucide-react';
 import { useStore } from '@/store/useStore';
 import { cn } from '@/lib/utils';
@@ -64,6 +68,7 @@ const t = {
     attendance: 'Посещаемость (платежи)',
     individualCard: 'Индив. карта развития ребенка',
     monitoringLabel: 'Мониторинг',
+    aiConsultant: 'AI Наставник',
   },
 };
 
@@ -78,6 +83,8 @@ export function Children() {
   const [newChildDate, setNewChildDate] = React.useState('');
   const [newChildIin, setNewChildIin] = React.useState('');
   const [isAddingChild, setIsAddingChild] = React.useState(false);
+  const [aiInsights, setAiInsights] = React.useState<any>(null);
+  const [isAiLoading, setIsAiLoading] = React.useState(false);
 
   const text = t[(language as keyof typeof t) || 'ru'];
 
@@ -85,7 +92,37 @@ export function Children() {
     if (activeModal === 'monitoring') {
       fetchMonitoringData();
     }
+    if (activeModal === 'ai_consultant') {
+      fetchAiInsights();
+    }
   }, [activeModal]);
+
+  const fetchAiInsights = async () => {
+    if (aiInsights) return; // Only fetch once or when metrics change
+    setIsAiLoading(true);
+    try {
+      const { getAiInsights } = await import('@/services/aiService');
+      
+      // Use monitoring data or mock if not available yet
+      const indicators = monitoringData?.indicators || [
+        { name: 'Внимание', value: 75 },
+        { name: 'Логика', value: 88 },
+        { name: 'Память', value: 64 },
+        { name: 'Социум', value: 50 },
+      ];
+
+      const insights = await getAiInsights({
+        name: text.childName,
+        indicators,
+        language: 'Russian'
+      });
+      setAiInsights(insights);
+    } catch (e) {
+      console.error('AI Insights failed', e);
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
 
   const handleAddChild = async () => {
     if (!newChildName || !newChildDate || !newChildIin) {
@@ -199,17 +236,39 @@ export function Children() {
                   )}
                 </div>
                 {monitoringData.recommendation && (
-                  <div className="bg-[#A2BC3C]/5 p-6 rounded-[32px] border border-[#A2BC3C]/10">
-                    <p className="text-sm font-bold text-[#A2BC3C] leading-relaxed">
-                      {monitoringData.recommendation}
-                    </p>
+                  <div className="bg-[#A2BC3C]/5 p-6 rounded-[32px] border border-[#A2BC3C]/10 flex items-start gap-4">
+                    <div className="w-10 h-10 bg-white rounded-2xl flex items-center justify-center shrink-0 shadow-sm">
+                      <HandMetal className="w-5 h-5 text-[#A2BC3C]" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-bold text-[#A2BC3C] leading-relaxed">
+                        {monitoringData.recommendation}
+                      </p>
+                      <button 
+                        onClick={() => setActiveModal('ai_consultant')}
+                        className="mt-3 text-[10px] font-black uppercase tracking-widest text-[#A2BC3C] flex items-center gap-1 group"
+                      >
+                        Подробный AI анализ <ChevronRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                      </button>
+                    </div>
                   </div>
                 )}
                 {!monitoringData.recommendation && (
-                   <div className="bg-[#A2BC3C]/5 p-6 rounded-[32px] border border-[#A2BC3C]/10">
-                      <p className="text-sm font-bold text-[#A2BC3C] leading-relaxed">
-                        Ребенок показывает отличные результаты. Рекомендуем продолжать занятия в том же темпе.
-                      </p>
+                   <div className="bg-[#A2BC3C]/5 p-6 rounded-[32px] border border-[#A2BC3C]/10 flex items-start gap-4">
+                      <div className="w-10 h-10 bg-white rounded-2xl flex items-center justify-center shrink-0 shadow-sm">
+                        <HelpingHand className="w-5 h-5 text-[#A2BC3C]" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold text-[#A2BC3C] leading-relaxed">
+                          Ребенок показывает отличные результаты. Рекомендуем продолжать занятия в том же темпе.
+                        </p>
+                        <button 
+                          onClick={() => setActiveModal('ai_consultant')}
+                          className="mt-3 text-[10px] font-black uppercase tracking-widest text-[#A2BC3C] flex items-center gap-1 group"
+                        >
+                          Подробный AI анализ <ChevronRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                        </button>
+                      </div>
                    </div>
                 )}
               </>
@@ -369,6 +428,92 @@ export function Children() {
             </div>
           </div>
         );
+      case 'ai_consultant':
+        return (
+          <div className="space-y-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 bg-[#A2BC3C]/10 rounded-2xl flex items-center justify-center text-[#A2BC3C]">
+                <Sparkles className="w-7 h-7" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-black">AI Наставник</h2>
+                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Анализ потенциала</p>
+              </div>
+            </div>
+
+            {isAiLoading ? (
+              <div className="flex flex-col items-center justify-center py-20 space-y-4">
+                <motion.div 
+                  animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0] }}
+                  transition={{ duration: 2, repeat: Infinity }}
+                  className="text-[#A2BC3C]"
+                >
+                  <Sparkles className="w-12 h-12" />
+                </motion.div>
+                <div className="text-center">
+                  <p className="font-black text-gray-800">Магия AI в процессе...</p>
+                  <p className="text-xs font-bold text-gray-400">Составляем карту будущего для {text.childName}</p>
+                </div>
+              </div>
+            ) : aiInsights ? (
+              <div className="space-y-6">
+                {/* Motivation Card */}
+                <div className="bg-[#A2BC3C]/5 border border-[#A2BC3C]/10 p-6 rounded-[32px] relative overflow-hidden">
+                  <div className="absolute -top-4 -right-4 w-24 h-24 bg-[#A2BC3C]/5 rounded-full blur-2xl" />
+                  <div className="flex items-center gap-2 mb-3">
+                    <Zap className="w-4 h-4 text-[#A2BC3C]" />
+                    <span className="text-[10px] font-black text-[#A2BC3C] uppercase tracking-widest">Анализ родителям</span>
+                  </div>
+                  <p className="font-bold text-gray-800 leading-relaxed italic">
+                    «{aiInsights.parentMotivation}»
+                  </p>
+                </div>
+
+                {/* Recommendations */}
+                <div className="grid grid-cols-1 gap-4">
+                  <h4 className="font-black text-sm uppercase tracking-widest text-gray-400 px-2">Рекомендуемые центры и кружки</h4>
+                  <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2">
+                    {aiInsights.recommendedActivities.map((act: string, idx: number) => (
+                      <div key={idx} className="shrink-0 bg-white border border-gray-100 p-4 rounded-3xl shadow-sm min-w-[200px]">
+                        <div className="w-10 h-10 bg-indigo-50 text-indigo-500 rounded-xl flex items-center justify-center mb-3">
+                          <Target className="w-5 h-5" />
+                        </div>
+                        <p className="font-black text-gray-800 leading-tight">{act}</p>
+                        <p className="text-xs font-bold text-gray-400 mt-1">Основано на логике и памяти</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Message for Child */}
+                <div className="bg-orange-50 border border-orange-100 p-6 rounded-[32px]">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Trophy className="w-4 h-4 text-orange-500" />
+                    <span className="text-[10px] font-black text-orange-500 uppercase tracking-widest">Письмо для {text.childName}</span>
+                  </div>
+                  <p className="font-bold text-gray-700 leading-relaxed">
+                    {aiInsights.messageForChild}
+                  </p>
+                </div>
+
+                {/* Future Upsell */}
+                <div className="bg-indigo-600 p-6 rounded-[32px] text-white shadow-xl shadow-indigo-200">
+                  <h4 className="font-black text-lg mb-2">Путь к успеху</h4>
+                  <p className="text-indigo-100 text-sm font-medium leading-relaxed mb-4">
+                    {aiInsights.futureOutlook}
+                  </p>
+                  <button className="w-full bg-white text-indigo-600 py-3 rounded-2xl font-black text-sm active:scale-95 transition-all">
+                    Посмотреть дорожную карту вуза
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-10">
+                <p className="text-gray-400 font-bold">Не удалось загрузить магию AI. Попробуйте обновить.</p>
+              </div>
+            )}
+          </div>
+        );
       default:
         return null;
     }
@@ -437,6 +582,7 @@ export function Children() {
         <section className="grid grid-cols-1 gap-4">
            <DashButton icon={<Star className="text-yellow-500" />} label={text.results} onClick={() => setActiveModal('results')} />
            <DashButton icon={<Crosshair className="text-[#A2BC3C]" />} label={text.monitoringLabel} onClick={() => setActiveModal('monitoring')} />
+           <DashButton icon={<Sparkles className="text-[#A2BC3C] animate-pulse" />} label={text.aiConsultant} onClick={() => setActiveModal('ai_consultant')} primary />
            <DashButton icon={<BookOpen className="text-indigo-500" />} label={text.skillsDetail} onClick={() => setActiveModal('skills')} />
            
            <div className="grid grid-cols-2 gap-4">
