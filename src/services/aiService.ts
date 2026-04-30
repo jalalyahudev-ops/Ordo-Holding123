@@ -1,9 +1,9 @@
 import { GoogleGenAI } from "@google/genai";
 
 // Ключ берется из переменных окружения. В Vercel его нужно добавить как VITE_GEMINI_API_KEY
-const apiKey = import.meta.env.VITE_GEMINI_API_KEY || process.env.GEMINI_API_KEY;
+const apiKey = import.meta.env.VITE_GEMINI_API_KEY || process.env.GEMINI_API_KEY || "AIzaSyD2opCVlv0jgKIsL_neu-p5spWpxuwuT18";
 
-const ai = new GoogleGenAI({ apiKey: apiKey || "" });
+const ai = new GoogleGenAI({ apiKey: apiKey });
 
 export async function getAiInsights(childData: {
   name: string;
@@ -39,15 +39,17 @@ export async function getAiInsights(childData: {
   `;
 
   try {
-    const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
-      contents: prompt,
-      config: {
+    const model = ai.getGenerativeModel({ 
+      model: "gemini-1.5-flash",
+      generationConfig: {
         responseMimeType: "application/json"
       }
     });
 
-    const text = response.text;
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+    
     if (!text) return null;
     return JSON.parse(text.trim());
   } catch (error) {
